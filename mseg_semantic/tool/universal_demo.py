@@ -69,8 +69,8 @@ def run_universal_demo(args, use_gpu: bool = True) -> None:
         crop_h = args.test_h,
         crop_w = args.test_w,
         input_file=args.input_file,
-        model_taxonomy='universal',
-        eval_taxonomy='universal',
+        output_taxonomy='universal',
+        #eval_taxonomy='universal',
         scales = args.scales
     )
     itask.execute()

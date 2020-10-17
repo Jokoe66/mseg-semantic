@@ -13,6 +13,7 @@ import torch.nn as nn
 import torch.utils.data
 import torch.backends.cudnn as cudnn
 from typing import List, Tuple
+import tqdm
 
 from mseg.utils.dir_utils import check_mkdir, create_leading_fpath_dirs
 from mseg.utils.names_utils import get_universal_class_names
@@ -512,9 +513,7 @@ class InferenceTask:
 		batch_time = AverageMeter()
 		end = time.time()
 
-		for i, (input, _) in enumerate(test_loader):
-			logger.info(f'On image {i}')
-
+		for i, (input, _) in enumerate(tqdm.tqdm(test_loader)):
 			data_time.update(time.time() - end)
 			# convert Pytorch tensor -> Numpy
 			input = np.squeeze(input.numpy(), axis=0)
@@ -530,7 +529,7 @@ class InferenceTask:
 			cv2.imwrite(gray_path, gray_img)
 
 			# todo: update to time remaining.
-			if ((i + 1) % self.args.print_freq == 0) or (i + 1 == len(test_loader)):
+			if 0 and ((i + 1) % self.args.print_freq == 0) or (i + 1 == len(test_loader)):
 				logger.info('Test: [{}/{}] '
 				'Data {data_time.val:.3f} ({data_time.avg:.3f}) '
 				'Batch {batch_time.val:.3f} ({batch_time.avg:.3f}).'.format(i + 1, len(test_loader),
