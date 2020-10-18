@@ -14,6 +14,7 @@ import torch.utils.data
 import torch.backends.cudnn as cudnn
 from typing import List, Tuple
 import tqdm
+import mmcv
 
 from mseg.utils.dir_utils import check_mkdir, create_leading_fpath_dirs
 from mseg.utils.names_utils import get_universal_class_names
@@ -508,6 +509,7 @@ class InferenceTask:
         os.makedirs(self.args.save_folder, exist_ok=True)
         gray_folder = os.path.join(self.args.save_folder, 'gray')
         self.gray_folder = gray_folder
+        check_mkdir(self.gray_folder)
 
         data_time = AverageMeter()
         batch_time = AverageMeter()
@@ -522,9 +524,9 @@ class InferenceTask:
             gray_img = self.execute_on_img_single(image)
             batch_time.update(time.time() - end)
             end = time.time()
-            check_mkdir(self.gray_folder)
-            image_path, _ = self.data_list[i]
-            results[image_path] = gray_img
+            image_name, _ = self.data_list[i]
+            img_id = image_name[len(self.input_file):]
+            results[img_id] = gray_img
 
             # todo: update to time remaining.
             if 0 and ((i + 1) % self.args.print_freq == 0) or (i + 1 == len(test_loader)):
