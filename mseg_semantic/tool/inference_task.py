@@ -512,6 +512,7 @@ class InferenceTask:
 		data_time = AverageMeter()
 		batch_time = AverageMeter()
 		end = time.time()
+		results = dict() # path: label_map
 
 		for i, (input, _) in enumerate(tqdm.tqdm(test_loader)):
 			data_time.update(time.time() - end)
@@ -523,10 +524,7 @@ class InferenceTask:
 			end = time.time()
 			check_mkdir(self.gray_folder)
 			image_path, _ = self.data_list[i]
-			gray_path = os.path.join(
-				gray_folder, '/'.join(image_path.split('/')[-2:]))
-			os.makedirs(os.path.dirname(gray_path), exist_ok=True)
-			cv2.imwrite(gray_path, gray_img)
+			results[image_path] = gray_img
 
 			# todo: update to time remaining.
 			if 0 and ((i + 1) % self.args.print_freq == 0) or (i + 1 == len(test_loader)):
@@ -535,6 +533,8 @@ class InferenceTask:
 				'Batch {batch_time.val:.3f} ({batch_time.avg:.3f}).'.format(i + 1, len(test_loader),
 				data_time=data_time,
 				batch_time=batch_time))
+		mmcv.dump(results, os.path.join(gray_folder, 'label_maps.pkl'))
+
 
 
 	def scale_process_cuda(self, image: np.ndarray, h: int, w: int, stride_rate: float = 2/3):
